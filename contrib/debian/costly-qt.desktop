@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Costly
+Comment=Costly P2P Cryptocurrency
+Comment[fr]=Costly, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Costly, eşten eşe kriptografik sanal para birimi
+Exec=costly-qt %u
+Terminal=false
+Type=Application
+Icon=costly128
+MimeType=x-scheme-handler/costly;
+Categories=Office;Finance;

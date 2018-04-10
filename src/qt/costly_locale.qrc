@@ -1,0 +1,20 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="bg">locale/costly_bg.qm</file>
+        <file alias="de">locale/costly_de.qm</file>
+        <file alias="en">locale/costly_en.qm</file>
+        <file alias="es">locale/costly_es.qm</file>
+        <file alias="fi">locale/costly_fi.qm</file>
+        <file alias="fr">locale/costly_fr.qm</file>
+        <file alias="it">locale/costly_it.qm</file>
+        <file alias="ja">locale/costly_ja.qm</file>
+        <file alias="pl">locale/costly_pl.qm</file>
+        <file alias="pt">locale/costly_pt.qm</file>
+        <file alias="ru">locale/costly_ru.qm</file>
+        <file alias="sk">locale/costly_sk.qm</file>
+        <file alias="sv">locale/costly_sv.qm</file>
+        <file alias="vi">locale/costly_vi.qm</file>
+        <file alias="zh_CN">locale/costly_zh_CN.qm</file>
+        <file alias="zh_TW">locale/costly_zh_TW.qm</file>
+    </qresource>
+</RCC>

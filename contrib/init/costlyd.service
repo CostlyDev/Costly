@@ -1,0 +1,22 @@
+[Unit]
+Description=Costly's distributed currency daemon
+After=network.target
+
+[Service]
+User=costly
+Group=costly
+
+Type=forking
+PIDFile=/var/lib/costlyd/costlyd.pid
+ExecStart=/usr/bin/costlyd -daemon -pid=/var/lib/costlyd/costlyd.pid \
+-conf=/etc/costly/costly.conf -datadir=/var/lib/costlyd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

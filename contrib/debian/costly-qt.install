@@ -1,0 +1,6 @@
+usr/local/bin/costly-qt usr/bin
+share/pixmaps/costly32.xpm usr/share/pixmaps
+share/pixmaps/costly16.xpm usr/share/pixmaps
+share/pixmaps/costly128.png usr/share/pixmaps
+debian/costly-qt.desktop usr/share/applications
+debian/costly-qt.protocol usr/share/kde4/services/

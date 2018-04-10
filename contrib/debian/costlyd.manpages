@@ -1,0 +1,3 @@
+debian/manpages/costlyd.1
+debian/manpages/costly.conf.5
+debian/manpages/costly-cli.1

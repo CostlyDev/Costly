@@ -1,4 +1,4 @@
-Costly Core staging tree 0.12.1
+Costly Core staging tree 1.0.0.0
 ===============================
 
 What is Costly?

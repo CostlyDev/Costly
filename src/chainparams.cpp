@@ -124,6 +124,7 @@ public:
 
         vSeeds.push_back(CDNSSeedData("node_1", "35.196.166.61"));
         vSeeds.push_back(CDNSSeedData("node_2", "35.196.122.255"));
+		vSeeds.push_back(CDNSSeedData("node_3", "154.16.7.227"));
 
         // Costly addresses start with 'C'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,28);

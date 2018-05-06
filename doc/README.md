@@ -9,16 +9,10 @@ The following are some helpful notes on how to run Costly on your native platfor
 
 ### Unix
 
-You need the Qt4 run-time libraries to run Costly-Qt. On Debian or Ubuntu:
-
-	sudo apt-get install libqtgui4
-
 Unpack the files into a directory and run:
 
-- bin/32/costly-qt (GUI, 32-bit) or bin/32/costlyd (headless, 32-bit)
-- bin/64/costly-qt (GUI, 64-bit) or bin/64/costlyd (headless, 64-bit)
-
-
+- `bin/bitcoin-qt` (GUI) or
+- `bin/bitcoind` (headless)
 
 ### Windows
 
@@ -26,7 +20,7 @@ Unpack the files into a directory, and then run costly-qt.exe.
 
 ### OS X
 
-Drag Costly-Core to your applications folder, and then run Costly-Core.
+Drag Costly-Qt to your applications folder, and then run Costly-Qt.
 
 ### Need Help?
 
@@ -37,7 +31,7 @@ for help and more information.
 
 Building
 ---------------------
-The following are developer notes on how to build Costly on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
+The following are developer notes on how to build Costly Core on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
 - [OS X Build Notes](build-osx.md)
 - [Unix Build Notes](build-unix.md)
@@ -47,7 +41,7 @@ The following are developer notes on how to build Costly on your native platform
 
 Development
 ---------------------
-The Costly repo's [root README](/README.md) contains relevant information on the development process and automated testing.
+The Costly Core repo's [root README](/README.md) contains relevant information on the development process and automated testing.
 
 - [Developer Notes](developer-notes.md)
 - [Multiwallet Qt Development](multiwallet-qt.md)

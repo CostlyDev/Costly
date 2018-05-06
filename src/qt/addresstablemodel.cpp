@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -373,7 +373,7 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
         CPubKey newKey;
         if(!wallet->GetKeyFromPool(newKey))
         {
-            WalletModel::UnlockContext ctx(walletModel->requestUnlock(true));
+            WalletModel::UnlockContext ctx(walletModel->requestUnlock());
             if(!ctx.isValid())
             {
                 // Unlock wallet failed or was cancelled

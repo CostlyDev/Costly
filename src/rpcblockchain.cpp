@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
-
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -274,6 +274,40 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
         fVerbose = params[0].get_bool();
 
     return mempoolToJSON(fVerbose);
+}
+
+UniValue getblockhashes(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 2)
+        throw runtime_error(
+            "getblockhashes timestamp\n"
+            "\nReturns array of hashes of blocks within the timestamp range provided.\n"
+            "\nArguments:\n"
+            "1. high         (numeric, required) The newer block timestamp\n"
+            "2. low          (numeric, required) The older block timestamp\n"
+            "\nResult:\n"
+            "[\n"
+            "  \"hash\"         (string) The block hash\n"
+            "]\n"
+            "\nExamples:\n"
+            + HelpExampleCli("getblockhashes", "1231614698 1231024505")
+            + HelpExampleRpc("getblockhashes", "1231614698, 1231024505")
+        );
+
+    unsigned int high = params[0].get_int();
+    unsigned int low = params[1].get_int();
+    std::vector<uint256> blockHashes;
+
+    if (!GetTimestampIndex(high, low, blockHashes)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for block hashes");
+    }
+
+    UniValue result(UniValue::VARR);
+    for (std::vector<uint256>::const_iterator it=blockHashes.begin(); it!=blockHashes.end(); it++) {
+        result.push_back(it->GetHex());
+    }
+
+    return result;
 }
 
 UniValue getblockhash(const UniValue& params, bool fHelp)
@@ -814,16 +848,20 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "[\n"
             "  {\n"
-            "    \"height\": xxxx,         (numeric) height of the chain tip\n"
-            "    \"hash\": \"xxxx\",         (string) block hash of the tip\n"
-            "    \"branchlen\": 0          (numeric) zero for main chain\n"
-            "    \"status\": \"active\"      (string) \"active\" for the main chain\n"
+            "    \"height\": xxxx,             (numeric) height of the chain tip\n"
+            "    \"hash\": \"xxxx\",             (string) block hash of the tip\n"
+            "    \"difficulty\" : x.xxx,       (numeric) The difficulty\n"
+            "    \"chainwork\" : \"0000...1f3\"  (string) Expected number of hashes required to produce the current chain (in hex)\n"
+            "    \"branchlen\": 0              (numeric) zero for main chain\n"
+            "    \"status\": \"active\"          (string) \"active\" for the main chain\n"
             "  },\n"
             "  {\n"
             "    \"height\": xxxx,\n"
             "    \"hash\": \"xxxx\",\n"
-            "    \"branchlen\": 1          (numeric) length of branch connecting the tip to the main chain\n"
-            "    \"status\": \"xxxx\"        (string) status of the chain (active, valid-fork, valid-headers, headers-only, invalid)\n"
+            "    \"difficulty\" : x.xxx,\n"
+            "    \"chainwork\" : \"0000...1f3\"\n"
+            "    \"branchlen\": 1              (numeric) length of branch connecting the tip to the main chain\n"
+            "    \"status\": \"xxxx\"            (string) status of the chain (active, valid-fork, valid-headers, headers-only, invalid)\n"
             "  }\n"
             "]\n"
             "Possible values for status:\n"
@@ -877,6 +915,7 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
         obj.push_back(Pair("height", block->nHeight));
         obj.push_back(Pair("hash", block->phashBlock->GetHex()));
         obj.push_back(Pair("difficulty", GetDifficulty(block)));
+        obj.push_back(Pair("chainwork", block->nChainWork.GetHex()));
         obj.push_back(Pair("branchlen", branchLen));
 
         string status;

@@ -74,6 +74,7 @@ public:
 protected:
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
+    void showEvent(QShowEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     bool eventFilter(QObject *object, QEvent *event);
@@ -122,9 +123,11 @@ private:
     QAction *showBackupsAction;
     QAction *openAction;
     QAction *showHelpMessageAction;
+    QAction *showPrivateSendHelpAction;
 
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
+    QMenu *dockIconMenu;
     Notificator *notificator;
     RPCConsole *rpcConsole;
     HelpMessageDialog *helpMessageDialog;
@@ -144,7 +147,7 @@ private:
     /** Create system tray icon and notification */
     void createTrayIcon(const NetworkStyle *networkStyle);
     /** Create system tray menu (or setup the dock menu) */
-    void createTrayIconMenu();
+    void createIconMenu(QMenu *pmenu);
 
     /** Enable or disable all wallet-related actions */
     void setWalletActionsEnabled(bool enabled);
@@ -236,6 +239,8 @@ private Q_SLOTS:
 
     /** Show help message dialog */
     void showHelpMessageClicked();
+    /** Show PrivateSend help message dialog */
+    void showPrivateSendHelpClicked();
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);

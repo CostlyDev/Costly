@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -220,18 +220,14 @@ extern const char *REJECT;
 extern const char *SENDHEADERS;
 
 // Costly message types
+// NOTE: do NOT declare non-implmented here, we don't want them to be exposed to the outside
 // TODO: add description
-extern const char *IX;
-extern const char *IXLOCKVOTE;
+extern const char *TXLOCKREQUEST;
+extern const char *TXLOCKVOTE;
 extern const char *SPORK;
 extern const char *GETSPORKS;
-extern const char *MNWINNER;
-extern const char *MNWINNERSSYNC;
-extern const char *MNGOVERNANCESYNC;
-extern const char *MNGOVERNANCEVOTE;
-extern const char *MNGOVERNANCEOBJECT;
-extern const char *MNGOVERNANCEFINAL;
-extern const char *MNGOVERNANCEFINALVOTE;
+extern const char *MASTERNODEPAYMENTVOTE;
+extern const char *MASTERNODEPAYMENTSYNC;
 extern const char *MNANNOUNCE;
 extern const char *MNPING;
 extern const char *DSACCEPT;
@@ -244,6 +240,10 @@ extern const char *DSTX;
 extern const char *DSQUEUE;
 extern const char *DSEG;
 extern const char *SYNCSTATUSCOUNT;
+extern const char *MNGOVERNANCESYNC;
+extern const char *MNGOVERNANCEOBJECT;
+extern const char *MNGOVERNANCEOBJECTVOTE;
+extern const char *MNVERIFY;
 };
 
 /* Get a vector of all valid message types (see above) */
@@ -252,16 +252,16 @@ const std::vector<std::string> &getAllNetMessageTypes();
 /** nServices flags */
 enum {
     // NODE_NETWORK means that the node is capable of serving the block chain. It is currently
-    // set by all Bitcoin Core nodes, and is unset by SPV clients or other peers that just want
+    // set by all Costly Core nodes, and is unset by SPV clients or other peers that just want
     // network services but don't provide them.
     NODE_NETWORK = (1 << 0),
     // NODE_GETUTXO means the node is capable of responding to the getutxo protocol request.
-    // Bitcoin Core does not support this but a patch set called Bitcoin XT does.
+    // Costly Core does not support this but a patch set called Bitcoin XT does.
     // See BIP 64 for details on how this is implemented.
     NODE_GETUTXO = (1 << 1),
     // NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.
-    // Bitcoin Core nodes used to support this by default, without advertising this bit,
-    // but no longer do as of protocol version 70011 (= NO_BLOOM_VERSION)
+    // Costly Core nodes used to support this by default, without advertising this bit,
+    // but no longer do as of protocol version 70201 (= NO_BLOOM_VERSION)
     NODE_BLOOM = (1 << 2),
 
     // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
@@ -341,19 +341,24 @@ enum {
     // Nodes may always request a MSG_FILTERED_BLOCK in a getdata, however,
     // MSG_FILTERED_BLOCK should not appear in any invs except as a part of getdata.
     MSG_FILTERED_BLOCK,
+    // Costly message types
+    // NOTE: declare non-implmented here, we must keep this enum consistent and backwards compatible
     MSG_TXLOCK_REQUEST,
     MSG_TXLOCK_VOTE,
     MSG_SPORK,
-    MSG_MASTERNODE_WINNER,
-    MSG_MASTERNODE_SCANNING_ERROR, // not implemented
-    MSG_GOVERNANCE_VOTE,
-    MSG_GOVERNANCE_OBJECT,
-    MSG_BUDGET_FINALIZED,
-    MSG_BUDGET_FINALIZED_VOTE,
+    MSG_MASTERNODE_PAYMENT_VOTE,
+    MSG_MASTERNODE_PAYMENT_BLOCK, // reusing, was MSG_MASTERNODE_SCANNING_ERROR previousely, was NOT used in 12.0
+    MSG_BUDGET_VOTE, // depreciated since 12.1
+    MSG_BUDGET_PROPOSAL, // depreciated since 12.1
+    MSG_BUDGET_FINALIZED, // depreciated since 12.1
+    MSG_BUDGET_FINALIZED_VOTE, // depreciated since 12.1
     MSG_MASTERNODE_QUORUM, // not implemented
     MSG_MASTERNODE_ANNOUNCE,
     MSG_MASTERNODE_PING,
-    MSG_DSTX
+    MSG_DSTX,
+    MSG_GOVERNANCE_OBJECT,
+    MSG_GOVERNANCE_OBJECT_VOTE,
+    MSG_MASTERNODE_VERIFY,
 };
 
 #endif // BITCOIN_PROTOCOL_H

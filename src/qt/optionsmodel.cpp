@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,6 +21,10 @@
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
+#endif
+
+#include "darksend.h"
+#ifdef ENABLE_WALLET
 #include "masternodeconfig.h"
 #endif
 
@@ -88,6 +92,9 @@ void OptionsModel::Init(bool resetSettings)
         settings.setValue("fShowAdvancedPSUI", false);
     fShowAdvancedPSUI = settings.value("fShowAdvancedPSUI", false).toBool();
 
+    if (!settings.contains("fLowKeysWarning"))
+        settings.setValue("fLowKeysWarning", true);
+
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
     //
@@ -116,24 +123,24 @@ void OptionsModel::Init(bool resetSettings)
 
     // PrivateSend
     if (!settings.contains("nPrivateSendRounds"))
-        settings.setValue("nPrivateSendRounds", 2);
+        settings.setValue("nPrivateSendRounds", DEFAULT_PRIVATESEND_ROUNDS);
     if (!SoftSetArg("-privatesendrounds", settings.value("nPrivateSendRounds").toString().toStdString()))
         addOverriddenOption("-privatesendrounds");
     nPrivateSendRounds = settings.value("nPrivateSendRounds").toInt();
 
-    if (!settings.contains("nAnonymizeCostlyAmount")) {
+    if (!settings.contains("nPrivateSendAmount")) {
         // for migration from old settings
-        if (!settings.contains("nAnonymizeDarkcoinAmount"))
-            settings.setValue("nAnonymizeCostlyAmount", 1000);
+        if (!settings.contains("nAnonymizeCostlyAmount"))
+            settings.setValue("nPrivateSendAmount", DEFAULT_PRIVATESEND_AMOUNT);
         else
-            settings.setValue("nAnonymizeCostlyAmount", settings.value("nAnonymizeDarkcoinAmount").toInt());
+            settings.setValue("nPrivateSendAmount", settings.value("nAnonymizeCostlyAmount").toInt());
     }
-    if (!SoftSetArg("-anonymizecostlyamount", settings.value("nAnonymizeCostlyAmount").toString().toStdString()))
-        addOverriddenOption("-anonymizecostlyamount");
-    nAnonymizeCostlyAmount = settings.value("nAnonymizeCostlyAmount").toInt();
+    if (!SoftSetArg("-privatesendamount", settings.value("nPrivateSendAmount").toString().toStdString()))
+        addOverriddenOption("-privatesendamount");
+    nPrivateSendAmount = settings.value("nPrivateSendAmount").toInt();
 
     if (!settings.contains("fPrivateSendMultiSession"))
-        settings.setValue("fPrivateSendMultiSession", fPrivateSendMultiSession);
+        settings.setValue("fPrivateSendMultiSession", DEFAULT_PRIVATESEND_MULTISESSION);
     if (!SoftSetBoolArg("-privatesendmultisession", settings.value("fPrivateSendMultiSession").toBool()))
         addOverriddenOption("-privatesendmultisession");
     fPrivateSendMultiSession = settings.value("fPrivateSendMultiSession").toBool();
@@ -249,14 +256,16 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
 #ifdef ENABLE_WALLET
         case SpendZeroConfChange:
             return settings.value("bSpendZeroConfChange");
-        case ShowAdvancedPSUI:
-            return fShowAdvancedPSUI;
-        case PrivateSendRounds:
-            return settings.value("nPrivateSendRounds");
-        case AnonymizeCostlyAmount:
-            return settings.value("nAnonymizeCostlyAmount");
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
+        case ShowAdvancedPSUI:
+            return fShowAdvancedPSUI;
+        case LowKeysWarning:
+            return settings.value("fLowKeysWarning");
+        case PrivateSendRounds:
+            return settings.value("nPrivateSendRounds");
+        case PrivateSendAmount:
+            return settings.value("nPrivateSendAmount");
         case PrivateSendMultiSession:
             return settings.value("fPrivateSendMultiSession");
 #endif
@@ -265,9 +274,9 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
         case ThirdPartyTxUrls:
             return strThirdPartyTxUrls;
         case Digits:
-            return settings.value("digits");            
+            return settings.value("digits");
         case Theme:
-            return settings.value("theme");            
+            return settings.value("theme");
         case Language:
             return settings.value("language");
         case CoinControlFeatures:
@@ -381,10 +390,19 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
                 setRestartRequired(true);
             }
             break;
+        case ShowMasternodesTab:
+            if (settings.value("fShowMasternodesTab") != value) {
+                settings.setValue("fShowMasternodesTab", value);
+                setRestartRequired(true);
+            }
+            break;
         case ShowAdvancedPSUI:
             fShowAdvancedPSUI = value.toBool();
             settings.setValue("fShowAdvancedPSUI", fShowAdvancedPSUI);
             Q_EMIT advancedPSUIChanged(fShowAdvancedPSUI);
+            break;
+        case LowKeysWarning:
+            settings.setValue("fLowKeysWarning", value);
             break;
         case PrivateSendRounds:
             if (settings.value("nPrivateSendRounds") != value)
@@ -394,18 +412,12 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
                 Q_EMIT privateSendRoundsChanged();
             }
             break;
-        case AnonymizeCostlyAmount:
-            if (settings.value("nAnonymizeCostlyAmount") != value)
+        case PrivateSendAmount:
+            if (settings.value("nPrivateSendAmount") != value)
             {
-                nAnonymizeCostlyAmount = value.toInt();
-                settings.setValue("nAnonymizeCostlyAmount", nAnonymizeCostlyAmount);
-                Q_EMIT anonymizeCostlyAmountChanged();
-            }
-            break;
-        case ShowMasternodesTab:
-            if (settings.value("fShowMasternodesTab") != value) {
-                settings.setValue("fShowMasternodesTab", value);
-                setRestartRequired(true);
+                nPrivateSendAmount = value.toInt();
+                settings.setValue("nPrivateSendAmount", nPrivateSendAmount);
+                Q_EMIT privateSentAmountChanged();
             }
             break;
         case PrivateSendMultiSession:

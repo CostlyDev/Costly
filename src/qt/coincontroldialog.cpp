@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,10 +15,12 @@
 #include "walletmodel.h"
 
 #include "coincontrol.h"
-#include "darksend.h"
 #include "init.h"
 #include "main.h" // For minRelayTxFee
 #include "wallet/wallet.h"
+
+#include "darksend.h"
+#include "instantx.h"
 
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 
@@ -135,7 +137,7 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
     ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
     ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, 190);
-    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 88);
+    ui->treeWidget->setColumnWidth(COLUMN_PRIVATESEND_ROUNDS, 88);
     ui->treeWidget->setColumnWidth(COLUMN_DATE, 80);
     ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 100);
     ui->treeWidget->setColumnWidth(COLUMN_PRIORITY, 100);
@@ -447,13 +449,13 @@ void CoinControlDialog::viewItemChanged(QTreeWidgetItem* item, int column)
             item->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
         else {
             coinControl->Select(outpt);
-            CTxIn vin(outpt);
-            int rounds = pwalletMain->GetInputPrivateSendRounds(vin);
-            if(coinControl->useDarkSend && rounds < nPrivateSendRounds) {
+            CTxIn txin = CTxIn(outpt);
+            int nRounds = pwalletMain->GetInputPrivateSendRounds(txin);
+            if (coinControl->fUsePrivateSend && nRounds < nPrivateSendRounds) {
                 QMessageBox::warning(this, windowTitle(),
                     tr("Non-anonymized input selected. <b>PrivateSend will be disabled.</b><br><br>If you still want to use PrivateSend, please deselect all non-nonymized inputs first and then check PrivateSend checkbox again."),
                     QMessageBox::Ok, QMessageBox::Ok);
-                coinControl->useDarkSend = false;
+                coinControl->fUsePrivateSend = false;
             }
         }
 
@@ -583,6 +585,10 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
                 nBytesInputs += 148; // in all error cases, simply assume 148 here
         }
         else nBytesInputs += 148;
+
+        // Add inputs to calculate InstantSend Fee later
+        if(coinControl->fUseInstantSend)
+            txDummy.vin.push_back(CTxIn());
     }
 
     // calculation
@@ -607,7 +613,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
             nPayFee = coinControl->nMinimumTotalFee;
 
         // InstantSend Fee
-        if(coinControl->useInstantX) nPayFee = max(nPayFee, INSTANTSEND_MIN_FEE);
+        if (coinControl->fUseInstantSend) nPayFee = std::max(nPayFee, CTxLockRequest(txDummy).GetMinFee());
 
         // Allow free? (require at least hard-coded threshold and default to that if no estimate)
         double dPriorityNeeded = std::max(mempoolEstimatePriority, AllowFreeThreshold());
@@ -623,8 +629,8 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
             if (!CoinControlDialog::fSubtractFeeFromAmount)
                 nChange -= nPayFee;
 
-            // DS Fee = overpay
-            if(coinControl->useDarkSend && nChange > 0)
+            // PrivateSend Fee = overpay
+            if(coinControl->fUsePrivateSend && nChange > 0)
             {
                 nPayFee += nChange;
                 nChange = 0;
@@ -841,12 +847,12 @@ void CoinControlDialog::updateView()
             itemOutput->setText(COLUMN_DATE_INT64, strPad(QString::number(out.tx->GetTxTime()), 20, " "));
 
 
-            // ds+ rounds
-            CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
-            int rounds = pwalletMain->GetInputPrivateSendRounds(vin);
+            // PrivateSend rounds
+            CTxIn txin = CTxIn(out.tx->GetHash(), out.i);
+            int nRounds = pwalletMain->GetInputPrivateSendRounds(txin);
 
-            if(rounds >= 0 || fDebug) itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString::number(rounds), 11, " "));
-            else itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString(tr("n/a")), 11, " "));
+            if (nRounds >= 0 || fDebug) itemOutput->setText(COLUMN_PRIVATESEND_ROUNDS, strPad(QString::number(nRounds), 11, " "));
+            else itemOutput->setText(COLUMN_PRIVATESEND_ROUNDS, strPad(QString(tr("n/a")), 11, " "));
 
 
             // confirmations

@@ -13,7 +13,7 @@ can be found in the contrib/init folder.
 1. Service User
 ---------------------------------
 
-All three Linux startup configurations assume the existence of a "costly" user
+All three Linux startup configurations assume the existence of a "costlycore" user
 and group.  They must be created before attempting to use these scripts.
 The OS X configuration assumes costlyd will be set up for the current user.
 
@@ -54,23 +54,23 @@ see `contrib/debian/examples/costly.conf`.
 All three configurations assume several paths that might need to be adjusted.
 
 Binary:              `/usr/bin/costlyd`  
-Configuration file:  `/etc/costly/costly.conf`  
+Configuration file:  `/etc/costlycore/costly.conf`  
 Data directory:      `/var/lib/costlyd`  
 PID file:            `/var/run/costlyd/costlyd.pid` (OpenRC and Upstart) or `/var/lib/costlyd/costlyd.pid` (systemd)  
 Lock file:           `/var/lock/subsys/costlyd` (CentOS)  
 
 The configuration file, PID directory (if applicable) and data directory
-should all be owned by the costly user and group.  It is advised for security
+should all be owned by the costlycore user and group.  It is advised for security
 reasons to make the configuration file and data directory only readable by the
-costly user and group.  Access to costly-cli and other costlyd rpc clients
+costlycore user and group.  Access to costly-cli and other costlyd rpc clients
 can then be controlled by group membership.
 
 3b) Mac OS X
 
 Binary:              `/usr/local/bin/costlyd`  
-Configuration file:  `~/Library/Application Support/Costly/costly.conf`  
-Data directory:      `~/Library/Application Support/Costly`
-Lock file:           `~/Library/Application Support/Costly/.lock`
+Configuration file:  `~/Library/Application Support/CostlyCore/costly.conf`  
+Data directory:      `~/Library/Application Support/CostlyCore`
+Lock file:           `~/Library/Application Support/CostlyCore/.lock`
 
 4. Installing Service Configuration
 -----------------------------------
@@ -116,7 +116,7 @@ This Launch Agent will cause costlyd to start whenever the user logs in.
 
 NOTE: This approach is intended for those wanting to run costlyd as the current user.
 You will need to modify org.costly.costlyd.plist if you intend to use it as a
-Launch Daemon with a dedicated costly user.
+Launch Daemon with a dedicated costlycore user.
 
 5. Auto-respawn
 -----------------------------------

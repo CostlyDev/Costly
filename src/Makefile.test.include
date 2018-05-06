@@ -20,11 +20,10 @@ EXTRA_DIST += \
 	test/data/txcreatesign.hex
 
 JSON_TEST_FILES = \
-  test/data/script_valid.json \
+  test/data/script_tests.json \
   test/data/base58_keys_valid.json \
   test/data/base58_encode_decode.json \
   test/data/base58_keys_invalid.json \
-  test/data/script_invalid.json \
   test/data/tx_invalid.json \
   test/data/tx_valid.json \
   test/data/sighash.json
@@ -44,6 +43,9 @@ BITCOIN_TESTS =\
   test/base64_tests.cpp \
   test/bip32_tests.cpp \
   test/bloom_tests.cpp \
+  test/bswap_tests.cpp \
+  test/cachemap_tests.cpp \
+  test/cachemultimap_tests.cpp \
   test/checkblock_tests.cpp \
   test/Checkpoints_tests.cpp \
   test/coins_tests.cpp \
@@ -65,11 +67,13 @@ BITCOIN_TESTS =\
   test/policyestimator_tests.cpp \
   test/pow_tests.cpp \
   test/prevector_tests.cpp \
+  test/ratecheck_tests.cpp \
   test/reverselock_tests.cpp \
   test/rpc_tests.cpp \
   test/sanity_tests.cpp \
   test/scheduler_tests.cpp \
   test/script_P2SH_tests.cpp \
+  test/script_P2PKH_tests.cpp \
   test/script_tests.cpp \
   test/scriptnum_tests.cpp \
   test/serialize_tests.cpp \

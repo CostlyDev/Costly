@@ -1,4 +1,4 @@
-Building Costly
+Building Costly Core
 
 Use the autogen script to prepare the build environment.
 
@@ -7,7 +7,7 @@ Use the autogen script to prepare the build environment.
     make
 
 Precompiled binaries are available at github, see
-https://github.com/costlyproject/costly-binaries
+https://github.com/costlypay/costly-binaries
 
 Always verify the signatures and checksums.
 

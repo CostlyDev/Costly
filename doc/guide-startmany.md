@@ -120,7 +120,7 @@ If you generated a new masternode private key, you will need to update the remot
 
 Shut down the daemon and then edit the file.
 
-```nano .costly/costly.conf```
+```nano .costlycore/costly.conf```
 
 ### Edit the masternodeprivkey
 If you generated a new masternode private key, you will need to update the `masternodeprivkey` value in your remote `costly.conf` file.
@@ -135,7 +135,7 @@ You can confirm that remote server is on the correct block by issuing
 
 ```costly-cli getinfo```
 
-and comparing with the official explorer at http://explorer.costly.org/chain/Costly
+and comparing with the official explorer at https://explorer.costly.org/chain/Costly
 
 ### Local
 

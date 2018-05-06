@@ -2,10 +2,10 @@
 #include "ui_darksendconfig.h"
 
 #include "bitcoinunits.h"
+#include "darksend.h"
 #include "guiconstants.h"
 #include "optionsmodel.h"
 #include "walletmodel.h"
-#include "init.h"
 
 #include <QMessageBox>
 #include <QPushButton>
@@ -84,8 +84,8 @@ void DarksendConfig::configure(bool enabled, int coins, int rounds) {
     QSettings settings;
 
     settings.setValue("nPrivateSendRounds", rounds);
-    settings.setValue("nAnonymizeCostlyAmount", coins);
+    settings.setValue("nPrivateSendAmount", coins);
 
     nPrivateSendRounds = rounds;
-    nAnonymizeCostlyAmount = coins;
+    nPrivateSendAmount = coins;
 }

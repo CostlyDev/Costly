@@ -1,7 +1,7 @@
-TOR SUPPORT IN COSTLY
+TOR SUPPORT IN COSTLY CORE
 =======================
 
-It is possible to run Costly as a Tor hidden service, and connect to such services.
+It is possible to run Costly Core as a Tor hidden service, and connect to such services.
 
 The following directions assume you have a Tor proxy running on port 9050. Many
 distributions default to having a SOCKS proxy listening on port 9050, but others
@@ -10,10 +10,10 @@ port. See [Tor Project FAQ:TBBSocksPort](https://www.torproject.org/docs/faq.htm
 for how to properly configure Tor.
 
 
-1. Run costly behind a Tor proxy
+1. Run Costly Core behind a Tor proxy
 ----------------------------------
 
-The first step is running Costly behind a Tor proxy. This will already make all
+The first step is running Costly Core behind a Tor proxy. This will already make all
 outgoing connections be anonymized, but more is possible.
 
 	-proxy=ip:port  Set the proxy server. If SOCKS5 is selected (default), this proxy
@@ -44,25 +44,25 @@ In a typical situation, this suffices to run behind a Tor proxy:
 	./costlyd -proxy=127.0.0.1:9050
 
 
-2. Run a costly hidden server
+2. Run a Costly Core hidden server
 -------------------------------
 
 If you configure your Tor system accordingly, it is possible to make your node also
 reachable from the Tor network. Add these lines to your /etc/tor/torrc (or equivalent
 config file):
 
-	HiddenServiceDir /var/lib/tor/costly-service/
+	HiddenServiceDir /var/lib/tor/costlycore-service/
 	HiddenServicePort 9972 127.0.0.1:9972
 	HiddenServicePort 19972 127.0.0.1:19972
 
 The directory can be different of course, but (both) port numbers should be equal to
 your costlyd's P2P listen port (9972 by default).
 
-	-externalip=X   You can tell costly about its publicly reachable address using
+	-externalip=X   You can tell Costly Core about its publicly reachable address using
 	                this option, and this can be a .onion address. Given the above
 	                configuration, you can find your onion address in
-	                /var/lib/tor/costly-service/hostname. Onion addresses are given
-	                preference for your node to advertize itself with, for connections
+	                /var/lib/tor/costlycore-service/hostname. Onion addresses are given
+	                preference for your node to advertise itself with, for connections
 	                coming from unroutable addresses (such as 127.0.0.1, where the
 	                Tor proxy typically runs).
 
@@ -99,7 +99,7 @@ for normal IPv4/IPv6 communication, use:
 	./costlyd -onion=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -discover
 
 
-3. List of known costly Tor relays
+3. List of known Costly Core Tor relays
 ------------------------------------
 
 * [darkcoinie7ghp67.onion](http://darkcoinie7ghp67.onion/)

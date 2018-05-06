@@ -124,7 +124,7 @@ _costlyd() {
 
             COMPREPLY=( $( compgen -W "$helpopts $commands" -- "$cur" ) )
 
-            # Prevent space if an argument is desired
+            # Prevent space if an argument is costlyd
             if [[ $COMPREPLY == *= ]]; then
                 compopt -o nospace
             fi

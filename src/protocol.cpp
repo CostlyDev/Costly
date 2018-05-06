@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -36,18 +36,18 @@ const char *FILTERCLEAR="filterclear";
 const char *REJECT="reject";
 const char *SENDHEADERS="sendheaders";
 // Costly message types
-const char *IX="ix";
-const char *IXLOCKVOTE="txlvote";
+const char *TXLOCKREQUEST="ix";
+const char *TXLOCKVOTE="txlvote";
 const char *SPORK="spork";
 const char *GETSPORKS="getsporks";
-const char *MNWINNER="mnw";
-const char *MNWINNERSSYNC="mnget";
-const char *MNSCANERROR="mn scan error"; // not implemented
-const char *MNGOVERNANCESYNC="mnvs";
-const char *MNGOVERNANCEVOTE="mvote";
-const char *MNGOVERNANCEOBJECT="mprop";
-const char *MNGOVERNANCEFINAL="fbs";
-const char *MNGOVERNANCEFINALVOTE="fbvote";
+const char *MASTERNODEPAYMENTVOTE="mnw";
+const char *MASTERNODEPAYMENTBLOCK="mnwb";
+const char *MASTERNODEPAYMENTSYNC="mnget";
+const char *MNBUDGETSYNC="mnvs"; // depreciated since 12.1
+const char *MNBUDGETVOTE="mvote"; // depreciated since 12.1
+const char *MNBUDGETPROPOSAL="mprop"; // depreciated since 12.1
+const char *MNBUDGETFINAL="fbs"; // depreciated since 12.1
+const char *MNBUDGETFINALVOTE="fbvote"; // depreciated since 12.1
 const char *MNQUORUM="mn quorum"; // not implemented
 const char *MNANNOUNCE="mnb";
 const char *MNPING="mnp";
@@ -61,6 +61,10 @@ const char *DSTX="dstx";
 const char *DSQUEUE="dsq";
 const char *DSEG="dseg";
 const char *SYNCSTATUSCOUNT="ssc";
+const char *MNGOVERNANCESYNC="govsync";
+const char *MNGOVERNANCEOBJECT="govobj";
+const char *MNGOVERNANCEOBJECTVOTE="govobjvote";
+const char *MNVERIFY="mnv";
 };
 
 static const char* ppszTypeName[] =
@@ -69,20 +73,24 @@ static const char* ppszTypeName[] =
     NetMsgType::TX,
     NetMsgType::BLOCK,
     "filtered block", // Should never occur
-// Costly message types
-    NetMsgType::IX,
-    NetMsgType::IXLOCKVOTE,
+    // Costly message types
+    // NOTE: include non-implmented here, we must keep this list in sync with enum in protocol.h
+    NetMsgType::TXLOCKREQUEST,
+    NetMsgType::TXLOCKVOTE,
     NetMsgType::SPORK,
-    NetMsgType::MNWINNER,
-    NetMsgType::MNSCANERROR, // not implemented
-    NetMsgType::MNGOVERNANCEVOTE,
-    NetMsgType::MNGOVERNANCEOBJECT,
-    NetMsgType::MNGOVERNANCEFINAL,
-    NetMsgType::MNGOVERNANCEFINALVOTE,
+    NetMsgType::MASTERNODEPAYMENTVOTE,
+    NetMsgType::MASTERNODEPAYMENTBLOCK, // reusing, was MNSCANERROR previousely, was NOT used in 12.0, we need this for inv
+    NetMsgType::MNBUDGETVOTE, // depreciated since 12.1
+    NetMsgType::MNBUDGETPROPOSAL, // depreciated since 12.1
+    NetMsgType::MNBUDGETFINAL, // depreciated since 12.1
+    NetMsgType::MNBUDGETFINALVOTE, // depreciated since 12.1
     NetMsgType::MNQUORUM, // not implemented
     NetMsgType::MNANNOUNCE,
     NetMsgType::MNPING,
-    NetMsgType::DSTX
+    NetMsgType::DSTX,
+    NetMsgType::MNGOVERNANCEOBJECT,
+    NetMsgType::MNGOVERNANCEOBJECTVOTE,
+    NetMsgType::MNVERIFY,
 };
 
 /** All known message types. Keep this in the same order as the list of
@@ -111,18 +119,15 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::FILTERCLEAR,
     NetMsgType::REJECT,
     NetMsgType::SENDHEADERS,
-// Costly message types
-    NetMsgType::IX,
-    NetMsgType::IXLOCKVOTE,
+    // Costly message types
+    // NOTE: do NOT include non-implmented here, we want them to be "Unknown command" in ProcessMessage()
+    NetMsgType::TXLOCKREQUEST,
+    NetMsgType::TXLOCKVOTE,
     NetMsgType::SPORK,
     NetMsgType::GETSPORKS,
-    NetMsgType::MNWINNER,
-    NetMsgType::MNWINNERSSYNC,
-    NetMsgType::MNGOVERNANCESYNC,
-    NetMsgType::MNGOVERNANCEVOTE,
-    NetMsgType::MNGOVERNANCEOBJECT,
-    NetMsgType::MNGOVERNANCEFINAL,
-    NetMsgType::MNGOVERNANCEFINALVOTE,
+    NetMsgType::MASTERNODEPAYMENTVOTE,
+    // NetMsgType::MASTERNODEPAYMENTBLOCK, // there is no message for this, only inventory
+    NetMsgType::MASTERNODEPAYMENTSYNC,
     NetMsgType::MNANNOUNCE,
     NetMsgType::MNPING,
     NetMsgType::DSACCEPT,
@@ -134,7 +139,11 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::DSTX,
     NetMsgType::DSQUEUE,
     NetMsgType::DSEG,
-    NetMsgType::SYNCSTATUSCOUNT
+    NetMsgType::SYNCSTATUSCOUNT,
+    NetMsgType::MNGOVERNANCESYNC,
+    NetMsgType::MNGOVERNANCEOBJECT,
+    NetMsgType::MNGOVERNANCEOBJECTVOTE,
+    NetMsgType::MNVERIFY,
 };
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
@@ -233,7 +242,7 @@ CInv::CInv(const std::string& strType, const uint256& hashIn)
         }
     }
     if (i == ARRAYLEN(ppszTypeName))
-        LogPrint("net", "CInv::CInv(string, uint256) : unknown type '%s'\n", strType);
+        throw std::out_of_range(strprintf("CInv::CInv(string, uint256): unknown type '%s'", strType));
     hash = hashIn;
 }
 
@@ -250,8 +259,7 @@ bool CInv::IsKnownType() const
 const char* CInv::GetCommand() const
 {
     if (!IsKnownType())
-        LogPrint("net", "CInv::GetCommand() : type=%d unknown type\n", type);
-
+        throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
     return ppszTypeName[type];
 }
 

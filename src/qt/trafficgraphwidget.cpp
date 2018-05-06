@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-#define DESIRED_SAMPLES         800
+#define COSTLYD_SAMPLES         800
 
 #define XMARGIN                 10
 #define YMARGIN                 10
@@ -52,7 +52,7 @@ void TrafficGraphWidget::paintPath(QPainterPath &path, QQueue<float> &samples)
     if(sampleCount > 0) {
         path.moveTo(x, YMARGIN + h);
         for(int i = 0; i < sampleCount; ++i) {
-            x = XMARGIN + w - w * i / DESIRED_SAMPLES;
+            x = XMARGIN + w - w * i / COSTLYD_SAMPLES;
             y = YMARGIN + h - (int)(h * samples.at(i) / fMax);
             path.lineTo(x, y);
         }
@@ -131,10 +131,10 @@ void TrafficGraphWidget::updateRates()
     nLastBytesIn = bytesIn;
     nLastBytesOut = bytesOut;
 
-    while(vSamplesIn.size() > DESIRED_SAMPLES) {
+    while(vSamplesIn.size() > COSTLYD_SAMPLES) {
         vSamplesIn.pop_back();
     }
-    while(vSamplesOut.size() > DESIRED_SAMPLES) {
+    while(vSamplesOut.size() > COSTLYD_SAMPLES) {
         vSamplesOut.pop_back();
     }
 
@@ -152,7 +152,7 @@ void TrafficGraphWidget::updateRates()
 void TrafficGraphWidget::setGraphRangeMins(int mins)
 {
     nMins = mins;
-    int msecsPerSample = nMins * 60 * 1000 / DESIRED_SAMPLES;
+    int msecsPerSample = nMins * 60 * 1000 / COSTLYD_SAMPLES;
     timer->stop();
     timer->setInterval(msecsPerSample);
 

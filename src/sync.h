@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -80,7 +80,7 @@ typedef AnnotatedMixin<boost::recursive_mutex> CCriticalSection;
 /** Wrapped boost mutex: supports waiting but not recursive locking */
 typedef AnnotatedMixin<boost::mutex> CWaitableCriticalSection;
 
-/** Just a typedef for boost::condition_variable, can be wrapped later if desired */
+/** Just a typedef for boost::condition_variable, can be wrapped later if costlyd */
 typedef boost::condition_variable CConditionVariable;
 
 #ifdef DEBUG_LOCKORDER

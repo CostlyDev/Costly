@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
-
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -52,6 +52,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getchaintips", 0 },
     { "getchaintips", 1 },
     { "getblockhash", 0 },
+    { "getsuperblockbudget", 0 },
     { "move", 2 },
     { "move", 3 },
     { "sendfrom", 2 },
@@ -90,6 +91,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "signrawtransaction", 1 },
     { "signrawtransaction", 2 },
     { "sendrawtransaction", 1 },
+    { "sendrawtransaction", 2 },    
     { "fundrawtransaction", 1 },
     { "gettxout", 1 },
     { "gettxout", 2 },
@@ -97,6 +99,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "lockunspent", 0 },
     { "lockunspent", 1 },
     { "importprivkey", 2 },
+    { "importelectrumwallet", 1 },
     { "importaddress", 2 },
     { "importaddress", 3 },
     { "importpubkey", 2 },
@@ -114,7 +117,15 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "setban", 3 },
     { "spork", 1 },
     { "voteraw", 1 },
-    { "voteraw", 4 },
+    { "voteraw", 5 },
+    { "getblockhashes", 0 },
+    { "getblockhashes", 1 },
+    { "getspentinfo", 0},
+    { "getaddresstxids", 0},
+    { "getaddressbalance", 0},
+    { "getaddressdeltas", 0},
+    { "getaddressutxos", 0},
+    { "getaddressmempool", 0},
 };
 
 class CRPCConvertTable

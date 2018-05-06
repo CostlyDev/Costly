@@ -3,13 +3,13 @@ Description=Costly's distributed currency daemon
 After=network.target
 
 [Service]
-User=costly
-Group=costly
+User=costlycore
+Group=costlycore
 
 Type=forking
 PIDFile=/var/lib/costlyd/costlyd.pid
 ExecStart=/usr/bin/costlyd -daemon -pid=/var/lib/costlyd/costlyd.pid \
--conf=/etc/costly/costly.conf -datadir=/var/lib/costlyd -disablewallet
+-conf=/etc/costlycore/costly.conf -datadir=/var/lib/costlyd -disablewallet
 
 Restart=always
 PrivateTmp=true

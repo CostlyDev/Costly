@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
-
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -243,11 +243,11 @@ UniValue stop(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "stop\n"
-            "\nStop Costly server.");
+            "\nStop Costly Core server.");
     // Event loop will exit after current HTTP requests have been handled, so
     // this reply will get back to the client.
     StartShutdown();
-    return "Costly server stopping";
+    return "Costly Core server stopping";
 }
 
 /**
@@ -280,6 +280,7 @@ static const CRPCCommand vRPCCommands[] =
     { "blockchain",         "getbestblockhash",       &getbestblockhash,       true  },
     { "blockchain",         "getblockcount",          &getblockcount,          true  },
     { "blockchain",         "getblock",               &getblock,               true  },
+    { "blockchain",         "getblockhashes",         &getblockhashes,         true  },
     { "blockchain",         "getblockhash",           &getblockhash,           true  },
     { "blockchain",         "getblockheader",         &getblockheader,         true  },
     { "blockchain",         "getblockheaders",        &getblockheaders,        true  },
@@ -292,8 +293,7 @@ static const CRPCCommand vRPCCommands[] =
     { "blockchain",         "verifytxoutproof",       &verifytxoutproof,       true  },
     { "blockchain",         "gettxoutsetinfo",        &gettxoutsetinfo,        true  },
     { "blockchain",         "verifychain",            &verifychain,            true  },
-    { "blockchain",         "invalidateblock",        &invalidateblock,        true  },
-    { "blockchain",         "reconsiderblock",        &reconsiderblock,        true  },
+    { "blockchain",         "getspentinfo",           &getspentinfo,           false },
 
     /* Mining */
     { "mining",             "getblocktemplate",       &getblocktemplate,       true  },
@@ -318,6 +318,13 @@ static const CRPCCommand vRPCCommands[] =
     { "rawtransactions",    "fundrawtransaction",     &fundrawtransaction,     false },
 #endif
 
+    /* Address index */
+    { "addressindex",       "getaddressmempool",      &getaddressmempool,      true  },
+    { "addressindex",       "getaddressutxos",        &getaddressutxos,        false },
+    { "addressindex",       "getaddressdeltas",       &getaddressdeltas,       false },
+    { "addressindex",       "getaddresstxids",        &getaddresstxids,        false },
+    { "addressindex",       "getaddressbalance",      &getaddressbalance,      false },
+
     /* Utility functions */
     { "util",               "createmultisig",         &createmultisig,         true  },
     { "util",               "validateaddress",        &validateaddress,        true  }, /* uses wallet if enabled */
@@ -339,7 +346,9 @@ static const CRPCCommand vRPCCommands[] =
     { "costly",               "masternode",             &masternode,             true  },
     { "costly",               "masternodelist",         &masternodelist,         true  },
     { "costly",               "masternodebroadcast",    &masternodebroadcast,    true  },
-    { "costly",               "mngovernance",           &mngovernance,           true  },
+    { "costly",               "gobject",                &gobject,                true  },
+    { "costly",               "getgovernanceinfo",      &getgovernanceinfo,      true  },
+    { "costly",               "getsuperblockbudget",    &getsuperblockbudget,    true  },
     { "costly",               "voteraw",                &voteraw,                true  },
     { "costly",               "mnsync",                 &mnsync,                 true  },
     { "costly",               "spork",                  &spork,                  true  },
@@ -369,6 +378,7 @@ static const CRPCCommand vRPCCommands[] =
     { "wallet",             "getwalletinfo",          &getwalletinfo,          false },
     { "wallet",             "importprivkey",          &importprivkey,          true  },
     { "wallet",             "importwallet",           &importwallet,           true  },
+    { "wallet",             "importelectrumwallet",   &importelectrumwallet,   true  },
     { "wallet",             "importaddress",          &importaddress,          true  },
     { "wallet",             "importpubkey",           &importpubkey,           true  },
     { "wallet",             "keypoolrefill",          &keypoolrefill,          true  },

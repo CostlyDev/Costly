@@ -46,10 +46,11 @@ public:
         ThreadsScriptVerif,     // int
         DatabaseCache,          // int
         SpendZeroConfChange,    // bool
-        ShowAdvancedPSUI,       // bool
-        PrivateSendRounds,      // int
-        AnonymizeCostlyAmount,    // int
         ShowMasternodesTab,     // bool
+        ShowAdvancedPSUI,       // bool
+        LowKeysWarning,         // bool
+        PrivateSendRounds,      // int
+        PrivateSendAmount,      // int
         PrivateSendMultiSession,// bool
         Listen,                 // bool
         OptionIDRowCount,
@@ -97,7 +98,7 @@ private:
 Q_SIGNALS:
     void displayUnitChanged(int unit);
     void privateSendRoundsChanged();
-    void anonymizeCostlyAmountChanged();
+    void privateSentAmountChanged();
     void advancedPSUIChanged(bool);
     void coinControlFeaturesChanged(bool);
 };

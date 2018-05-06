@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -101,7 +101,7 @@ static std::string Translate(const char* psz)
 static QString GetLangTerritory()
 {
     QSettings settings;
-    // Get desired locale (e.g. "de_DE")
+    // Get costlyd locale (e.g. "de_DE")
     // 1) System default language
     QString lang_territory = QLocale::system().name();
     // 2) Language from QSettings
@@ -122,7 +122,7 @@ static void initTranslations(QTranslator &qtTranslatorBase, QTranslator &qtTrans
     QApplication::removeTranslator(&translatorBase);
     QApplication::removeTranslator(&translator);
 
-    // Get desired locale (e.g. "de_DE")
+    // Get costlyd locale (e.g. "de_DE")
     // 1) System default language
     QString lang_territory = GetLangTerritory();
 
@@ -372,7 +372,7 @@ BitcoinApplication::~BitcoinApplication()
 #endif
     // Delete Qt-settings if user clicked on "Reset Options"
     QSettings settings;
-    if(optionsModel->resetSettings){
+    if(optionsModel && optionsModel->resetSettings){
         settings.clear();
         settings.sync();
     }
@@ -411,6 +411,7 @@ void BitcoinApplication::createSplashScreen(const NetworkStyle *networkStyle)
     splash->setAttribute(Qt::WA_DeleteOnClose);
     splash->show();
     connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
+    connect(this, SIGNAL(requestedShutdown()), splash, SLOT(close()));
 }
 
 void BitcoinApplication::startThread()
@@ -536,8 +537,8 @@ void BitcoinApplication::shutdownResult(int retval)
 
 void BitcoinApplication::handleRunawayException(const QString &message)
 {
-    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. Costly can no longer continue safely and will quit.") + QString("\n\n") + message);
-    ::exit(1);
+    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. Costly Core can no longer continue safely and will quit.") + QString("\n\n") + message);
+    ::exit(EXIT_FAILURE);
 }
 
 WId BitcoinApplication::getMainWinId() const
@@ -609,9 +610,9 @@ int main(int argc, char *argv[])
     // but before showing splash screen.
     if (mapArgs.count("-?") || mapArgs.count("-h") || mapArgs.count("-help") || mapArgs.count("-version"))
     {
-        HelpMessageDialog help(NULL, mapArgs.count("-version"));
+        HelpMessageDialog help(NULL, mapArgs.count("-version") ? HelpMessageDialog::about : HelpMessageDialog::cmdline);
         help.showOrPrint();
-        return 1;
+        return EXIT_SUCCESS;
     }
 
     /// 5. Now that settings and translations are available, ask user for data directory
@@ -624,14 +625,14 @@ int main(int argc, char *argv[])
     {
         QMessageBox::critical(0, QObject::tr("Costly Core"),
                               QObject::tr("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(mapArgs["-datadir"])));
-        return 1;
+        return EXIT_FAILURE;
     }
     try {
         ReadConfigFile(mapArgs, mapMultiArgs);
     } catch (const std::exception& e) {
         QMessageBox::critical(0, QObject::tr("Costly Core"),
                               QObject::tr("Error: Cannot parse configuration file: %1. Only use key=value syntax.").arg(e.what()));
-        return false;
+        return EXIT_FAILURE;
     }
 
     /// 7. Determine network (and switch to network specific options)
@@ -645,7 +646,7 @@ int main(int argc, char *argv[])
         SelectParams(ChainNameFromCommandLine());
     } catch(std::exception &e) {
         QMessageBox::critical(0, QObject::tr("Costly Core"), QObject::tr("Error: %1").arg(e.what()));
-        return 1;
+        return EXIT_FAILURE;
     }
 #ifdef ENABLE_WALLET
     // Parse URIs on command line -- this can affect Params()
@@ -661,11 +662,11 @@ int main(int argc, char *argv[])
 
 #ifdef ENABLE_WALLET
     /// 7a. parse masternode.conf
-    string strErr;
+    std::string strErr;
     if(!masternodeConfig.read(strErr)) {
         QMessageBox::critical(0, QObject::tr("Costly Core"),
                               QObject::tr("Error reading masternode configuration file: %1").arg(strErr.c_str()));
-        return false;
+        return EXIT_FAILURE;
     }
 
     /// 8. URI IPC sending
@@ -675,7 +676,7 @@ int main(int argc, char *argv[])
     // - Do this after creating app and setting up translations, so errors are
     // translated properly.
     if (PaymentServer::ipcSendCommandLine())
-        exit(0);
+        exit(EXIT_SUCCESS);
 
     // Start up the payment server early, too, so impatient users that click on
     // costly: links repeatedly have their payment requests routed to this process:

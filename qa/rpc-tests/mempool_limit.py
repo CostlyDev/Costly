@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-# Copyright (c) 2018 The Costly Core developers
+# Copyright (c) 2014-2015 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -38,7 +38,6 @@ class MempoolLimitTest(BitcoinTestFramework):
         self.nodes[0].settxfee(0) # return to automatic fee selection
         txFS = self.nodes[0].signrawtransaction(txF['hex'])
         txid = self.nodes[0].sendrawtransaction(txFS['hex'])
-        self.nodes[0].lockunspent(True, [us0])
 
         relayfee = self.nodes[0].getnetworkinfo()['relayfee']
         base_fee = relayfee*100

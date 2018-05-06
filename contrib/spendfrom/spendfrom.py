@@ -33,12 +33,12 @@ def check_json_precision():
         raise RuntimeError("JSON encode/decode loses precision")
 
 def determine_db_dir():
-    """Return the default location of the costly data directory"""
+    """Return the default location of the Costly Core data directory"""
     if platform.system() == "Darwin":
-        return os.path.expanduser("~/Library/Application Support/Costly/")
+        return os.path.expanduser("~/Library/Application Support/CostlyCore/")
     elif platform.system() == "Windows":
-        return os.path.join(os.environ['APPDATA'], "Costly")
-    return os.path.expanduser("~/.costly")
+        return os.path.join(os.environ['APPDATA'], "CostlyCore")
+    return os.path.expanduser("~/.costlycore")
 
 def read_bitcoin_config(dbdir):
     """Read the costly.conf file from dbdir, returns dictionary of settings"""
@@ -63,7 +63,7 @@ def read_bitcoin_config(dbdir):
     return dict(config_parser.items("all"))
 
 def connect_JSON(config):
-    """Connect to a costly JSON-RPC server"""
+    """Connect to a Costly Core JSON-RPC server"""
     testnet = config.get('testnet', '0')
     testnet = (int(testnet) > 0)  # 0/1 in config file, convert to True/False
     if not 'rpcport' in config:

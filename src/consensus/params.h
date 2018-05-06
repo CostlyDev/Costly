@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -40,10 +40,15 @@ struct Params {
     int nMasternodePaymentsStartBlock;
     int nMasternodePaymentsIncreaseBlock;
     int nMasternodePaymentsIncreasePeriod; // in blocks
+    int nInstantSendKeepLock; // in blocks
     int nBudgetPaymentsStartBlock;
     int nBudgetPaymentsCycleBlocks;
     int nBudgetPaymentsWindowBlocks;
     int nBudgetProposalEstablishingTime; // in seconds
+    int nSuperblockStartBlock;
+    int nSuperblockCycle; // in blocks
+    int nGovernanceMinQuorum; // Min absolute vote count to trigger an action
+    int nGovernanceFilterElements;
     int nMasternodeMinimumConfirmations;
     /** Used to check majorities for block version upgrade */
     int nMajorityEnforceBlockUpgrade;

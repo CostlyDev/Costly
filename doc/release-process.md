@@ -15,7 +15,7 @@ Check out the source code in the following directory hierarchy.
 	git clone https://github.com/devrandom/gitian-builder.git
 	git clone https://github.com/costlypay/costly.git
 
-###Costly maintainers/release engineers, update (commit) version in sources
+###Costly Core maintainers/release engineers, update (commit) version in sources
 
 	pushd ./costly
 	contrib/verifysfbinaries/verify.sh
@@ -188,7 +188,7 @@ Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spur
 
 - Announce the release:
 
-  - Release sticky on costlytalk: https://costlytalk.org/index.php?board=1.0 ***TODO***
+  - Release on Costly forum: https://www.costly.org/forum/topic/official-announcements.54/
 
   - Costly-development mailing list
 

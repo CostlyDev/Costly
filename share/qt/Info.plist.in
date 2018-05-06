@@ -38,7 +38,7 @@
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>io.costlypay.Costly-Qt</string>
+  <string>org.costly.Costly-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>

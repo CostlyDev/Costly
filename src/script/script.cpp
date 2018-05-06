@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -131,7 +131,7 @@ const char* GetOpName(opcodetype opcode)
     // expanson
     case OP_NOP1                   : return "OP_NOP1";
     case OP_CHECKLOCKTIMEVERIFY    : return "OP_CHECKLOCKTIMEVERIFY";
-    case OP_NOP3                   : return "OP_NOP3";
+    case OP_CHECKSEQUENCEVERIFY    : return "OP_CHECKSEQUENCEVERIFY";
     case OP_NOP4                   : return "OP_NOP4";
     case OP_NOP5                   : return "OP_NOP5";
     case OP_NOP6                   : return "OP_NOP6";
@@ -222,6 +222,17 @@ bool CScript::IsNormalPaymentScript() const
     }
 
     return true;
+}
+
+bool CScript::IsPayToPublicKeyHash() const
+{
+    // Extra-fast test for pay-to-pubkey-hash CScripts:
+    return (this->size() == 25 &&
+	    (*this)[0] == OP_DUP &&
+	    (*this)[1] == OP_HASH160 &&
+	    (*this)[2] == 0x14 &&
+	    (*this)[23] == OP_EQUALVERIFY &&
+	    (*this)[24] == OP_CHECKSIG);
 }
 
 bool CScript::IsPayToScriptHash() const

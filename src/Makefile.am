@@ -3,21 +3,7 @@ DIST_SUBDIRS = secp256k1 univalue
 AM_LDFLAGS = $(PTHREAD_CFLAGS) $(LIBTOOL_LDFLAGS) $(HARDENED_LDFLAGS)
 AM_CXXFLAGS = $(HARDENED_CXXFLAGS)
 AM_CPPFLAGS = $(HARDENED_CPPFLAGS)
-
-if EMBEDDED_LEVELDB
-LEVELDB_CPPFLAGS += -I$(srcdir)/leveldb/include
-LEVELDB_CPPFLAGS += -I$(srcdir)/leveldb/helpers/memenv
-LIBLEVELDB += $(builddir)/leveldb/libleveldb.a
-LIBMEMENV  += $(builddir)/leveldb/libmemenv.a
-
-# NOTE: This dependency is not strictly necessary, but without it make may try to build both in parallel, which breaks the LevelDB build system in a race
-$(LIBLEVELDB): $(LIBMEMENV)
-
-$(LIBLEVELDB) $(LIBMEMENV):
-	@echo "Building LevelDB ..." && $(MAKE) -C $(@D) $(@F) CXX="$(CXX)" \
-	  CC="$(CC)" PLATFORM=$(TARGET_OS) AR="$(AR)" $(LEVELDB_TARGET_FLAGS) \
-          OPT="$(AM_CXXFLAGS) $(PIE_FLAGS) $(CXXFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -D__STDC_LIMIT_MACROS"
-endif
+EXTRA_LIBRARIES =
 
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
 BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
@@ -43,7 +29,7 @@ $(LIBUNIVALUE): $(wildcard univalue/lib/*) $(wildcard univalue/include/*)
 
 # Make is not made aware of per-object dependencies to avoid limiting building parallelization
 # But to build the less dependent modules first, we manually select their order here:
-EXTRA_LIBRARIES = \
+EXTRA_LIBRARIES += \
   crypto/libbitcoin_crypto.a \
   libbitcoin_util.a \
   libbitcoin_common.a \
@@ -80,12 +66,16 @@ endif
 # costly core #
 BITCOIN_CORE_H = \
   activemasternode.h \
+  addressindex.h \
+  spentindex.h \
   addrman.h \
   alert.h \
   amount.h \
   arith_uint256.h \
   base58.h \
   bloom.h \
+  cachemap.h \
+  cachemultimap.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -110,7 +100,11 @@ BITCOIN_CORE_H = \
   dsnotificationinterface.h \
   darksend-relay.h \
   governance.h \
+  governance-classes.h \
+  governance-exceptions.h \
+  governance-object.h \
   governance-vote.h \
+  governance-votedb.h \
   flat-database.h \
   hash.h \
   httprpc.h \
@@ -133,6 +127,7 @@ BITCOIN_CORE_H = \
   miner.h \
   net.h \
   netbase.h \
+  netfulfilledman.h \
   noui.h \
   policy/fees.h \
   policy/policy.h \
@@ -210,11 +205,15 @@ libbitcoin_server_a_SOURCES = \
   init.cpp \
   dbwrapper.cpp \
   governance.cpp \
+  governance-classes.cpp \
+  governance-object.cpp \
   governance-vote.cpp \
+  governance-votedb.cpp \
   main.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \
+  netfulfilledman.cpp \
   noui.cpp \
   policy/fees.cpp \
   policy/policy.cpp \
@@ -222,13 +221,14 @@ libbitcoin_server_a_SOURCES = \
   rest.cpp \
   rpcblockchain.cpp \
   rpcmasternode.cpp \
-  rpcmasternode-budget.cpp \
+  rpcgovernance.cpp \
   rpcmining.cpp \
   rpcmisc.cpp \
   rpcnet.cpp \
   rpcrawtransaction.cpp \
   rpcserver.cpp \
   script/sigcache.cpp \
+  sendalert.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
@@ -297,9 +297,9 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/shavite.c \
   crypto/simd.c \
   crypto/skein.c \
-  crypto/ripemd160.h \
   crypto/neoscrypt.c \
-  crypto/neoscrypt.h \  
+  crypto/neoscrypt.h \
+  crypto/ripemd160.h \
   crypto/sha1.cpp \
   crypto/sha1.h \
   crypto/sha256.cpp \
@@ -532,6 +532,10 @@ endif
 %.pb.cc %.pb.h: %.proto
 	@test -f $(PROTOC)
 	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(abspath $(<D) $<)
+
+if EMBEDDED_LEVELDB
+include Makefile.leveldb.include
+endif
 
 if ENABLE_TESTS
 include Makefile.test.include

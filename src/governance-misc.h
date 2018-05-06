@@ -1,9 +1,9 @@
-
+// Copyright (c) 2014-2017 The Costly Core developers
 
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef GOVERANCE_MISC_H
-#define GOVERANCE_MISC_H
+#ifndef GOVERNANCE_MISC_H
+#define GOVERNANCE_MISC_H
 
 #include "main.h"
 #include "governance.h"

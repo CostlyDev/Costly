@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-# Copyright (c) 2018 The Costly Core developers
+# Copyright (c) 2014-2015 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,7 +13,6 @@ from test_framework.script import *
 from test_framework.mininode import *
 from test_framework.blocktools import *
 
-COIN = 100000000
 SEQUENCE_LOCKTIME_DISABLE_FLAG = (1<<31)
 SEQUENCE_LOCKTIME_TYPE_FLAG = (1<<22) # this means use time (0 means height)
 SEQUENCE_LOCKTIME_GRANULARITY = 9 # this is a bit-shift

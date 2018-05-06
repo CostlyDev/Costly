@@ -1,7 +1,7 @@
 # /etc/conf.d/costlyd: config file for /etc/init.d/costlyd
 
 # Config file location
-#BITCOIND_CONFIGFILE="/etc/costly/costly.conf"
+#BITCOIND_CONFIGFILE="/etc/costlycore/costly.conf"
 
 # What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
 #BITCOIND_PIDDIR="/var/run/costlyd"
@@ -13,8 +13,8 @@
 #BITCOIND_DATADIR="/var/lib/costlyd"
 
 # User and group to own costlyd process
-#BITCOIND_USER="costly"
-#BITCOIND_GROUP="costly"
+#BITCOIND_USER="costlycore"
+#BITCOIND_GROUP="costlycore"
 
 # Path to costlyd executable
 #BITCOIND_BIN="/usr/bin/costlyd"

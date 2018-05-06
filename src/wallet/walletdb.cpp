@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2018 The Costly Core developers
-
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The Costly Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -950,7 +950,7 @@ bool AutoBackupWallet (CWallet* wallet, std::string strWalletFile, std::string& 
             // Update nKeysLeftSinceAutoBackup using current pool size
             wallet->nKeysLeftSinceAutoBackup = wallet->GetKeyPoolSize();
             LogPrintf("nKeysLeftSinceAutoBackup: %d\n", wallet->nKeysLeftSinceAutoBackup);
-            if(wallet->IsLocked()) {
+            if(wallet->IsLocked(true)) {
                 strBackupWarning = _("Wallet is locked, can't replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.");
                 LogPrintf("%s\n", strBackupWarning);
                 nWalletBackups = -2;

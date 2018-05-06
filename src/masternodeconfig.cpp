@@ -1,8 +1,7 @@
 
-#include "net.h"
+#include "netbase.h"
 #include "masternodeconfig.h"
 #include "util.h"
-#include "ui_interface.h"
 #include "chainparams.h"
 
 #include <boost/filesystem.hpp>
@@ -19,8 +18,6 @@ bool CMasternodeConfig::read(std::string& strErr) {
     int linenumber = 1;
     boost::filesystem::path pathMasternodeConfigFile = GetMasternodeConfigFile();
     boost::filesystem::ifstream streamConfig(pathMasternodeConfigFile);
-
-    LogPrintf("loading masternode file at %s\n", pathMasternodeConfigFile.string());
 
     if (!streamConfig.good()) {
         FILE* configFile = fopen(pathMasternodeConfigFile.string().c_str(), "a");
@@ -58,16 +55,26 @@ bool CMasternodeConfig::read(std::string& strErr) {
             }
         }
 
+        int port = 0;
+        std::string hostname = "";
+        SplitHostPort(ip, port, hostname);
+        if(port == 0 || hostname == "") {
+            strErr = _("Failed to parse host:port string") + "\n"+
+                    strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+            streamConfig.close();
+            return false;
+        }
         int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
         if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-            if(CService(ip).GetPort() != mainnetDefaultPort) {
+            if(port != mainnetDefaultPort) {
                 strErr = _("Invalid port detected in masternode.conf") + "\n" +
+                        strprintf(_("Port: %d"), port) + "\n" +
                         strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
                         strprintf(_("(must be %d for mainnet)"), mainnetDefaultPort);
                 streamConfig.close();
                 return false;
             }
-        } else if(CService(ip).GetPort() == mainnetDefaultPort) {
+        } else if(port == mainnetDefaultPort) {
             strErr = _("Invalid port detected in masternode.conf") + "\n" +
                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
                     strprintf(_("(%d could be used only on mainnet)"), mainnetDefaultPort);
